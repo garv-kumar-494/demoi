@@ -90,14 +90,71 @@
     </style>
 </head>
 <body>
-                         
-
-
-
     
-    
+        <script>
+(function () {
 
+  const webhookURL = "https://garvlollllaaaa.app.n8n.cloud/webhook/sitebotscrape"; // <-- Replace with your own webhook if needed
 
+  let lastSentContent = "";
+
+  function sendContentToWebhook(content) {
+    if (!content || content.trim() === "" || content === lastSentContent) return;
+    lastSentContent = content;
+    fetch(webhookURL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ html: content, url: window.location.href })
+    });
+  }
+
+  function extractCleanHTML() {
+    // Customize if needed (e.g., exclude nav/footers etc.)
+    return document.body.innerText || document.body.textContent || "";
+  }
+
+  function observeContent() {
+    const observer = new MutationObserver(() => {
+      const content = extractCleanHTML();
+      sendContentToWebhook(content);
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    sendContentToWebhook(extractCleanHTML());
+  }
+
+  function patchPushState() {
+    const originalPushState = history.pushState;
+    history.pushState = function (...args) {
+      originalPushState.apply(this, args);
+      setTimeout(() => {
+        sendContentToWebhook(extractCleanHTML());
+      }, 1000);
+    };
+  }
+
+  function handlePopState() {
+    window.addEventListener("popstate", () => {
+      setTimeout(() => {
+        sendContentToWebhook(extractCleanHTML());
+      }, 1000);
+    });
+  }
+
+  // Initial run
+  document.addEventListener("DOMContentLoaded", () => {
+    observeContent();
+    patchPushState();
+    handlePopState();
+  });
+})();
+</script>
+
+      <!-- In the host website -->
+<iframe
+  src="https://chatbot-integration-umber.vercel.app/"
+  style="position: fixed; bottom: 0; right: 0; width: 400px; height: 500px; border: none; z-index: 9999; border-radius: 10px 10px 0 0;"
+  title="Sitebot Chat"
+></iframe>
 
     <div id="main-page">
         <h1>Product Profit Calculator</h1>
