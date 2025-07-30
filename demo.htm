@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Profit Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .product-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .product-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .product-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        .product-detail {
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        .profit {
+            font-weight: bold;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+        .positive {
+            color: #27ae60;
+        }
+        .negative {
+            color: #e74c3c;
+        }
+        .summary {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        .detail-page {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .back-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: inline-block;
+            text-decoration: none;
+        }
+        .back-button:hover {
+            background-color: #2980b9;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+                         
+
+
+
+    
+    <iframe 
+  src="https://chatbot-integration-umber.vercel.app/" 
+  width="400" 
+  height="500" 
+  style="border:none; position: fixed; bottom: 80px; right: 20px; z-index: 9999; border-radius: 10px;">
+</iframe>
+
+
+
+    <div id="main-page">
+        <h1>Product Profit Calculator</h1>
+        
+        <div class="product-container" id="products">
+            <!-- Products will be added here by JavaScript -->
+        </div>
+        
+        <div class="summary">
+            <h2>Business Summary</h2>
+            <div class="product-detail">
+                <span>Total Revenue:</span>
+                <span id="total-revenue">$0.00</span>
+            </div>
+            <div class="product-detail">
+                <span>Total Expenses:</span>
+                <span id="total-expenses">$0.00</span>
+            </div>
+            <div class="product-detail">
+                <span>Total Profit:</span>
+                <span id="total-profit">$0.00</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="detail-page" class="hidden">
+        <div class="detail-page" id="product-detail-content">
+            <!-- Product details will be shown here -->
+        </div>
+        <a href="#" class="back-button" id="back-button">Back to Products</a>
+    </div>
+
+    <script>
+        // Product data
+        const products = [
+            { 
+                id: 1, 
+                name: "Math Textbook", 
+                cost: 15.00, 
+                price: 25.00, 
+                sold: 120, 
+                expenses: 800,
+                description: "Comprehensive mathematics textbook covering algebra, calculus, and geometry. Suitable for high school and college students.",
+                features: ["500+ pages", "Practice problems with solutions", "Color illustrations", "Online resources available"]
+            },
+            { 
+                id: 2, 
+                name: "Calculator", 
+                cost: 8.50, 
+                price: 19.99, 
+                sold: 85, 
+                expenses: 300,
+                description: "Scientific calculator with 240+ functions. Perfect for advanced mathematics and engineering courses.",
+                features: ["Solar powered with battery backup", "Two-line display", "Hard plastic case", "1-year warranty"]
+            },
+            { 
+                id: 3, 
+                name: "Geometry Set", 
+                cost: 3.20, 
+                price: 7.50, 
+                sold: 210, 
+                expenses: 150,
+                description: "Complete set of geometry tools for precise drawing and measurement.",
+                features: ["Metal compass", "15cm ruler", "Set squares", "Protractor", "Pencil and sharpener"]
+            },
+            { 
+                id: 4, 
+                name: "Notebook", 
+                cost: 1.80, 
+                price: 4.99, 
+                sold: 350, 
+                expenses: 100,
+                description: "Grid-ruled notebook specifically designed for mathematics work with numbered pages.",
+                features: ["100 sheets", "Grid-ruled pages", "Durable cover", "Pocket for loose papers"]
+            },
+            { 
+                id: 5, 
+                name: "Graph Paper", 
+                cost: 0.75, 
+                price: 2.50, 
+                sold: 420, 
+                expenses: 50,
+                description: "High-quality graph paper pads with various grid sizes for different mathematical applications.",
+                features: ["50 sheets per pad", "Multiple grid sizes available", "Perforated for easy tearing", "Reinforced binding edge"]
+            }
+        ];
+
+        // Function to calculate product metrics
+        function calculateProductMetrics(product) {
+            const revenue = product.price * product.sold;
+            const totalCost = product.cost * product.sold;
+            const profit = revenue - totalCost - product.expenses;
+            const margin = ((product.price - product.cost) / product.price) * 100;
+            
+            return {
+                revenue: revenue.toFixed(2),
+                profit: profit.toFixed(2),
+                margin: margin.toFixed(1),
+                totalCost: totalCost.toFixed(2)
+            };
+        }
+
+        // Function to show product details
+        function showProductDetails(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            
+            const metrics = calculateProductMetrics(product);
+            
+            document.getElementById('main-page').classList.add('hidden');
+            document.getElementById('detail-page').classList.remove('hidden');
+            
+            const detailContent = document.getElementById('product-detail-content');
+            detailContent.innerHTML = `
+                <h2>${product.name}</h2>
+                <p><strong>Description:</strong> ${product.description}</p>
+                
+                <h3>Features:</h3>
+                <ul>
+                    ${product.features.map(feature => `<li>${feature}</li>`).join('')}
+                </ul>
+                
+                <h3>Financial Details:</h3>
+                <div class="product-detail">
+                    <span>Cost:</span>
+                    <span>$${product.cost.toFixed(2)}</span>
+                </div>
+                <div class="product-detail">
+                    <span>Price:</span>
+                    <span>$${product.price.toFixed(2)}</span>
+                </div>
+                <div class="product-detail">
+                    <span>Margin:</span>
+                    <span>${metrics.margin}%</span>
+                </div>
+                <div class="product-detail">
+                    <span>Units Sold:</span>
+                    <span>${product.sold}</span>
+                </div>
+                <div class="product-detail">
+                    <span>Revenue:</span>
+                    <span>$${metrics.revenue}</span>
+                </div>
+                <div class="product-detail">
+                    <span>Expenses:</span>
+                    <span>$${product.expenses.toFixed(2)}</span>
+                </div>
+                <div class="profit ${metrics.profit >= 0 ? 'positive' : 'negative'}">
+                    <span>Profit:</span>
+                    <span>$${metrics.profit}</span>
+                </div>
+            `;
+        }
+
+        // Function to go back to main page
+        function goBackToMainPage() {
+            document.getElementById('main-page').classList.remove('hidden');
+            document.getElementById('detail-page').classList.add('hidden');
+        }
+
+        // Function to update the display
+        function updateDisplay() {
+            const productsContainer = document.getElementById('products');
+            productsContainer.innerHTML = '';
+            
+            let totalRevenue = 0;
+            let totalExpenses = 0;
+            let totalProfit = 0;
+            
+            products.forEach(product => {
+                const metrics = calculateProductMetrics(product);
+                
+                totalRevenue += parseFloat(metrics.revenue);
+                totalExpenses += product.expenses;
+                totalProfit += parseFloat(metrics.profit);
+                
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.onclick = () => showProductDetails(product.id);
+                
+                productCard.innerHTML = `
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-detail">
+                        <span>Cost:</span>
+                        <span>$${product.cost.toFixed(2)}</span>
+                    </div>
+                    <div class="product-detail">
+                        <span>Price:</span>
+                        <span>$${product.price.toFixed(2)}</span>
+                    </div>
+                    <div class="product-detail">
+                        <span>Margin:</span>
+                        <span>${metrics.margin}%</span>
+                    </div>
+                    <div class="product-detail">
+                        <span>Sold:</span>
+                        <span>${product.sold}</span>
+                    </div>
+                    <div class="product-detail">
+                        <span>Revenue:</span>
+                        <span>$${metrics.revenue}</span>
+                    </div>
+                    <div class="product-detail">
+                        <span>Expenses:</span>
+                        <span>$${product.expenses.toFixed(2)}</span>
+                    </div>
+                    <div class="profit ${metrics.profit >= 0 ? 'positive' : 'negative'}">
+                        <span>Profit:</span>
+                        <span>$${metrics.profit}</span>
+                    </div>
+                    <div style="margin-top: 10px; color: #3498db; text-align: center;">
+                        Click for details →
+                    </div>
+                `;
+                
+                productsContainer.appendChild(productCard);
+            });
+            
+            // Update summary
+            document.getElementById('total-revenue').textContent = `$${totalRevenue.toFixed(2)}`;
+            document.getElementById('total-expenses').textContent = `$${totalExpenses.toFixed(2)}`;
+            document.getElementById('total-profit').textContent = `$${totalProfit.toFixed(2)}`;
+            document.getElementById('total-profit').className = `product-detail ${totalProfit >= 0 ? 'positive' : 'negative'}`;
+        }
+
+        // Initialize the display
+        updateDisplay();
+        
+        // Set up back button
+        document.getElementById('back-button').addEventListener('click', function(e) {
+            e.preventDefault();
+            goBackToMainPage();
+        });
+    </script>
+</body>
+</html>
